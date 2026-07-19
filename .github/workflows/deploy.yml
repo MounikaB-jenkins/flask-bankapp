@@ -30,4 +30,5 @@ jobs:
             git pull origin main
             source venv/bin/activate
             pip install -r requirements.txt
-            sudo systemctl restart bankapp
+            pkill -f "python app.py" || true
+            nohup python app.py > flask.log 2>&1 &
