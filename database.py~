@@ -1,0 +1,18 @@
+import psycopg2
+
+
+connection = psycopg2.connect(
+    host="bank-demo.cbmg0i2yug5t.ap-south-2.rds.amazonaws.com",
+    database="bankapp",
+    user="bankadmin",
+    password="Av3nger$"
+)
+
+
+cursor = connection.cursor()
+
+cursor.execute(
+"SELECT * FROM customers"
+)
+
+print(cursor.fetchall())
