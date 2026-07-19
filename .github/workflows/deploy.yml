@@ -1,33 +1,74 @@
-name: Deploy Flask App
+name: Flask CI/CD
+
 
 on:
   push:
     branches:
       - main
 
+
 jobs:
-  deploy:
+
+  test:
 
     runs-on: ubuntu-latest
 
+
     steps:
 
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+
+      - name: Run Tests
+        run: |
+          pytest
+
+
+
+  deploy:
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+
+    steps:
 
       - name: Deploy to EC2
 
         uses: appleboy/ssh-action@v1.0.3
 
         with:
+
           host: ${{ secrets.EC2_HOST }}
+
           username: ${{ secrets.EC2_USER }}
+
           key: ${{ secrets.EC2_SSH_KEY }}
+
           port: 22
 
+
           script: |
+
             cd /home/ec2-user/flask
+
             git pull origin main
+
             source venv/bin/activate
+
             pip install -r requirements.txt
+
             nohup python app.py > flask.log 2>&1 &
